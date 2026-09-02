@@ -1,0 +1,55 @@
+name: renraku-gakari
+
+services:
+  web:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_COLLAB_URL: ${NEXT_PUBLIC_COLLAB_URL:-ws://localhost:1234}
+    image: renraku-gakari:local
+    command: npm run start:web
+    environment:
+      NODE_ENV: production
+      RENRAKU_BOOTSTRAP_ADDRESS: ${RENRAKU_BOOTSTRAP_ADDRESS:?RENRAKU_BOOTSTRAP_ADDRESSを設定してください}
+      RENRAKU_BOOTSTRAP_DISPLAY_NAME: ${RENRAKU_BOOTSTRAP_DISPLAY_NAME:-管理者}
+      RENRAKU_BOOTSTRAP_PASSWORD: ${RENRAKU_BOOTSTRAP_PASSWORD:?RENRAKU_BOOTSTRAP_PASSWORDを設定してください}
+    ports:
+      - "127.0.0.1:3010:3010"
+    volumes:
+      - app-data:/app/data
+    depends_on:
+      collab:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3010/login').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+
+  collab:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_COLLAB_URL: ${NEXT_PUBLIC_COLLAB_URL:-ws://localhost:1234}
+    image: renraku-gakari:local
+    command: npm run start:collab
+    environment:
+      NODE_ENV: production
+      COLLAB_PORT: 1234
+      COLLAB_SERVICE_TOKEN: ${COLLAB_SERVICE_TOKEN:?COLLAB_SERVICE_TOKENを設定してください}
+    ports:
+      - "127.0.0.1:1234:1234"
+    volumes:
+      - app-data:/app/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "const s=require('node:net').connect(1234,'127.0.0.1',()=>s.end());s.on('error',()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+    restart: unless-stopped
+
+volumes:
+  app-data:

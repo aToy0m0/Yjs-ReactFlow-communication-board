@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "mingleboard": {
+      "command": "node",
+      "args": ["C:\\absolute\\path\\to\\renraku-gakari\\mcp-server.mjs"],
+      "env": {
+        "MINGLEBOARD_ROOM": "product-discovery",
+        "MINGLEBOARD_COLLAB_URL": "ws://localhost:1234",
+        "MINGLEBOARD_COLLAB_TOKEN": "replace-with-the-collaboration-service-token",
+        "MINGLEBOARD_AGENT_OWNER": "User A",
+        "MINGLEBOARD_AGENT_NAME": "Claude Code",
+        "MINGLEBOARD_AGENT_ID": "user-a-claude-primary",
+        "MINGLEBOARD_AGENT_COLOR": "#7c3aed"
+      }
+    }
+  }
+}
